@@ -23,7 +23,7 @@ st.markdown("""
 
 st.title("Kathy Voice App")
 
-VOICE_ID = "s0WKCJa7Iu1nqq9ODx2e"
+VOICE_ID = "Z6M3ubAywLVnfDsgdx17"
 api_key = st.secrets["ELEVENLABS_API_KEY"]
 
 client = ElevenLabs(api_key=api_key)
