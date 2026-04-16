@@ -36,7 +36,7 @@ favorites = [
     "I'll find out and let you know",
     "I love you",
     "Yep",
-    "Nope",
+    "No",
     "Sounds Good"
 ]
 
@@ -60,8 +60,13 @@ def generate_audio_cached(text):
         model_id="eleven_multilingual_v2",
         text=text,
         output_format="mp3_44100_128"
-    )
-    return b"".join(audio)
+    voice_settings={
+    "stability": 0.7,
+    "similarity_boost": 0.75,
+    "style": 0.0,
+    "use_speaker_boost": True,
+    "speed": 1.15
+}
 
 def speak_text(text):
     st.session_state.last_spoken = text
