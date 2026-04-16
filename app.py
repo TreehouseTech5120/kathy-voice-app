@@ -59,14 +59,16 @@ def generate_audio_cached(text):
         voice_id=VOICE_ID,
         model_id="eleven_multilingual_v2",
         text=text,
-        output_format="mp3_44100_128"
-    voice_settings={
-    "stability": 0.7,
-    "similarity_boost": 0.75,
-    "style": 0.0,
-    "use_speaker_boost": True,
-    "speed": 1.15
-}
+        output_format="mp3_44100_128",
+        voice_settings={
+            "stability": 0.7,
+            "similarity_boost": 0.75,
+            "style": 0.0,
+            "use_speaker_boost": True,
+            "speed": 1.15
+        }
+    )
+    return b"".join(audio)
 
 def speak_text(text):
     st.session_state.last_spoken = text
