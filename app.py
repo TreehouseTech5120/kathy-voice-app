@@ -24,7 +24,7 @@ st.markdown("""
 st.title("Kathy Voice App")
 
 VOICE_ID = "s0WKCJa7Iu1nqq9ODx2e"
-api_key = "PASTE_YOUR_NEW_API_KEY_HERE"
+api_key = st.secrets["ELEVENLABS_API_KEY"]
 
 client = ElevenLabs(api_key=api_key)
 
@@ -116,7 +116,7 @@ text_input = st.text_area("Type here:", height=150, key="text_input")
 col_a, col_b = st.columns([3, 1])
 
 with col_a:
-    if st.button("Speak Typed Message", use_container_width=True):
+    if st.button("Speak", use_container_width=True):
         final_text = st.session_state.text_input.strip()
         if final_text:
             speak_text(final_text)
