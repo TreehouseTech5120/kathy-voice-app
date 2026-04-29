@@ -23,8 +23,8 @@ st.markdown("""
 
 st.title("Kathy Voice App")
 
-VOICE_ID = "Z6M3ubAywLVnfDsgdx17"
-api_key = st.secrets["ELEVENLABS_API_KEY"]
+VOICE_ID = "s0WKCJa7Iu1nqq9ODx2e"
+api_key = "PASTE_YOUR_NEW_API_KEY_HERE"
 
 client = ElevenLabs(api_key=api_key)
 
@@ -36,7 +36,7 @@ favorites = [
     "I'll find out and let you know",
     "I love you",
     "Yep",
-    "No",
+    "Nope",
     "Sounds Good"
 ]
 
@@ -59,14 +59,7 @@ def generate_audio_cached(text):
         voice_id=VOICE_ID,
         model_id="eleven_multilingual_v2",
         text=text,
-        output_format="mp3_44100_128",
-        voice_settings={
-            "stability": 0.7,
-            "similarity_boost": 0.75,
-            "style": 0.0,
-            "use_speaker_boost": True,
-            "speed": 1.15
-        }
+        output_format="mp3_44100_128"
     )
     return b"".join(audio)
 
@@ -123,7 +116,7 @@ text_input = st.text_area("Type here:", height=150, key="text_input")
 col_a, col_b = st.columns([3, 1])
 
 with col_a:
-    if st.button("Speak", use_container_width=True):
+    if st.button("Speak Typed Message", use_container_width=True):
         final_text = st.session_state.text_input.strip()
         if final_text:
             speak_text(final_text)
