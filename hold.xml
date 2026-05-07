@@ -1,1 +1,4 @@
-
+<Response>
+  <Say>Call connected. Please wait.</Say>
+  <Pause length="60"/>
+</Response>
