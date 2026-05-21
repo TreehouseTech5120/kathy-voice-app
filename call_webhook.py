@@ -94,7 +94,19 @@ def call_status():
             }, f)
 
     return "OK", 200
+@app.route("/call-state", methods=["GET"])
+def get_call_state():
+    try:
+        with open(CALL_STATE_FILE, "r") as f:
+            data = json.load(f)
+    except Exception:
+        data = {
+            "in_call": False,
+            "active_call_sid": None,
+            "caller_number": None
+        }
 
+    return data, 200
 if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
