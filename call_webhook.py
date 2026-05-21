@@ -1,4 +1,5 @@
 from flask import Flask, request, send_file
+import os
 import json
 
 app = Flask(__name__)
@@ -93,9 +94,6 @@ def call_status():
             }, f)
 
     return "OK", 200
-
-
-import os
 
 if __name__ == "__main__":
     app.run(
