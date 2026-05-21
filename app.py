@@ -317,6 +317,11 @@ load_call_state()
 
 sync_call_state_from_file()
 
+check_for_active_webhook_call()
+
+# -------------------------
+# CALL CONTROL
+# -------------------------
 # ----------------------------
 # CALL CONTROL
 # ----------------------------
