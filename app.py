@@ -21,16 +21,24 @@ SIGNALWIRE_BASE_URL = (
     f"Accounts/{SIGNALWIRE_PROJECT_ID}"
 )
 def check_for_active_webhook_call():
-    call_state_file = r"C:\Users\Reuseum\Desktop\Voice App\call_state.json"
+    WEBHOOK_BASE_URL = "https://profound-vibrancy-production-48fe.up.railway.app"
 
-    if os.path.exists(call_state_file):
-        with open(call_state_file, "r") as f:
-            data = json.load(f)
+    try:
+        response = requests.get(f"{WEBHOOK_BASE_URL}/call-state", timeout=5)
 
-        st.session_state.active_call_sid = data.get("active_call_sid")
-        st.session_state.in_call = data.get("in_call", False)
-        st.session_state.current_contact = data.get("caller_number", "Incoming Caller")
+        if response.status_code != 200:
+            return
 
+        data = response.json()
+
+        if data.get("in_call"):
+            st.session_state.in_call = True
+            st.session_state.active_call_sid = data.get("active_call_sid")
+            st.session_state.current_contact = data.get("caller_number", "Unknown Caller")
+            st.session_state.mode = "call"
+
+    except Exception:
+        return
 st.markdown("""
     <style>
     #MainMenu {visibility: hidden;}
