@@ -1,2 +1,5 @@
 streamlit
 elevenlabs
+requests
+signalwire
+flask
