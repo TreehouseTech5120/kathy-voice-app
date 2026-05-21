@@ -78,8 +78,6 @@ if "last_spoken" not in st.session_state:
 if not st.session_state.in_call:
     st_autorefresh(interval=10000, key="call_check")
 
-check_for_active_webhook_call()
-
 contacts = {
     "Barbara": "+13184263882",
     "Greg": "+12082469929",
