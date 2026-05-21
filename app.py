@@ -237,9 +237,6 @@ def play_typed_text_on_active_call(text):
         st.error(f"SignalWire update error: {response.status_code} {response.text}")
     else:
         st.success("Typed message sent to active call.")
-@app.route("/typed-audio", methods=["GET"])
-def typed_audio():
-    return send_file(TYPED_AUDIO_FILE, mimetype="audio/mpeg")
 def get_latest_active_outbound_call(to_number):
     url = f"{SIGNALWIRE_BASE_URL}/Calls.json"
 
