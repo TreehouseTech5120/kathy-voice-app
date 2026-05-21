@@ -5,7 +5,6 @@ import requests
 import streamlit as st
 import time
 from pathlib import Path
-from flask import Flask, request, Response, send_file
 APP_DIR = Path(__file__).parent
 TYPED_AUDIO_FILE = APP_DIR / "typed_message.mp3"
 CALL_STATE_FILE = APP_DIR / "call_state.json"
@@ -238,13 +237,6 @@ def play_typed_text_on_active_call(text):
         st.error(f"SignalWire update error: {response.status_code} {response.text}")
     else:
         st.success("Typed message sent to active call.")
-@app.route("/typed-message-cxml", methods=["GET", "POST"])
-def typed_message_cxml():
-    return Response(f"""
-<Response>
-    <Play>{WEBHOOK_BASE_URL}/typed-audio</Play>
-</Response>
-""", mimetype="text/xml")
 @app.route("/typed-audio", methods=["GET"])
 def typed_audio():
     return send_file(TYPED_AUDIO_FILE, mimetype="audio/mpeg")
