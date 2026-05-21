@@ -9,7 +9,7 @@ from pathlib import Path
 APP_DIR = Path(__file__).parent
 CALL_STATE_FILE = APP_DIR / "call_state.json"
 TYPED_AUDIO_FILE = APP_DIR / "typed_message.mp3"
-NGROK_BASE_URL = "https://profound-vibrancy-production-b1fe.up.railway.app"
+NGROK_BASE_URL = "profound-vibrancy-production-48fe.up.railway.app"
 
 INTRO_AUDIO_URL = "https://github.com/TreehouseTech5120/kathy-voice-app/raw/refs/heads/main/Hi%20this%20is%20Kathy.mp3"
 
