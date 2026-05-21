@@ -1,15 +1,15 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, Response, send_file
 import json
 import os
+from pathlib import Path
 
 app = Flask(__name__)
-
-from pathlib import Path
 
 APP_DIR = Path(__file__).parent
 CALL_STATE_FILE = APP_DIR / "call_state.json"
 TYPED_AUDIO_FILE = APP_DIR / "typed_message.mp3"
-NGROK_BASE_URL = "profound-vibrancy-production-48fe.up.railway.app"
+
+WEBHOOK_BASE_URL = "https://profound-vibrancy-production-48fe.up.railway.app"
 
 INTRO_AUDIO_URL = "https://github.com/TreehouseTech5120/kathy-voice-app/raw/refs/heads/main/Hi%20this%20is%20Kathy.mp3"
 
@@ -56,7 +56,7 @@ def typed_message_cxml():
 
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Play>{NGROK_BASE_URL}/typed-message-audio</Play>
+    <Play>{WEBHOOK_BASE_URL}/typed-message-audio</Play>
     <Pause length="600"/>
 </Response>""", 200, {"Content-Type": "text/xml"}
 
@@ -94,6 +94,8 @@ def call_status():
             }, f)
 
     return "OK", 200
+
+
 @app.route("/call-state", methods=["GET"])
 def get_call_state():
     try:
@@ -107,8 +109,11 @@ def get_call_state():
         }
 
     return data, 200
+
+
 if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=int(os.environ.get("PORT", 5000))
+    )
     )
