@@ -232,7 +232,7 @@ def play_typed_text_on_active_call(text):
         st.error(f"SignalWire update error: {response.status_code} {response.text}")
     else:
         st.success("Typed message sent to active call.")
-        def get_latest_active_outbound_call(to_number):
+    def get_latest_active_outbound_call(to_number):
     url = f"{SIGNALWIRE_BASE_URL}/Calls.json"
 
     response = requests.get(
