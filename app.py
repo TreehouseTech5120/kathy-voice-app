@@ -364,18 +364,24 @@ if True:
         if not call_sid:
             call_sid = get_latest_active_outbound_call(phone_number_to_call)
 
-        if call_sid:
-            st.success(f"GOT CALL SID: {call_sid}")
-            
-            save_call_state(call_sid, phone_number_to_call, "outbound")
+       if call_sid:
+    st.success(f"GOT CALL SID: {call_sid}")
 
-            st.session_state.active_call_sid = call_sid
-            st.session_state.current_contact = phone_number_to_call
-            st.session_state.in_call = True
-            st.session_state.mode = "call"
+    requests.post(
+        "https://profound-vibrancy-production-48fe.up.railway.app/set-call-state",
+        data={
+            "call_sid": call_sid,
+            "caller_number": phone_number_to_call
+        }
+    )
 
-            st.success("Outbound call connected.")
-            st.rerun()
+    st.session_state.active_call_sid = call_sid
+    st.session_state.current_contact = phone_number_to_call
+    st.session_state.in_call = True
+    st.session_state.mode = "call"
+
+    st.success("Outbound call connected.")
+    st.rerun()
         else:
             st.error("Call started, but I could not find the active outbound call SID.")
 else:
