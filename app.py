@@ -320,18 +320,30 @@ def sync_call_state_from_file():
         st.warning(f"Could not read call state: {e}")
 
 def clear_call_state():
+    if st.session_state.active_call_sid:
+        url = f"{SIGNALWIRE_BASE_URL}/Calls/{st.session_state.active_call_sid}.json"
+
+        payload = {
+            "Status": "completed"
+        }
+
+        requests.post(
+            url,
+            data=payload,
+            auth=HTTPBasicAuth(SIGNALWIRE_PROJECT_ID, SIGNALWIRE_API_TOKEN)
+        )
+
     if os.path.exists(CALL_STATE_FILE):
         os.remove(CALL_STATE_FILE)
+
+    requests.post("https://profound-vibrancy-production-48fe.up.railway.app/call-status", data={
+        "CallStatus": "completed"
+    })
 
     st.session_state.in_call = False
     st.session_state.active_call_sid = ""
     st.session_state.current_contact = ""
-
-load_call_state()
-
-sync_call_state_from_file()
-
-check_for_active_webhook_call()
+    st.session_state.mode = "in_person"
 
 # ----------------------------
 # CALL CONTROL
