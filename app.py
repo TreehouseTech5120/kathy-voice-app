@@ -364,7 +364,7 @@ if True:
         if not call_sid:
             call_sid = get_latest_active_outbound_call(phone_number_to_call)
 
-       if call_sid:
+        if call_sid:
     st.success(f"GOT CALL SID: {call_sid}")
 
     requests.post(
