@@ -388,7 +388,6 @@ if True:
         else:
             current_contact = st.session_state.get("current_contact", "Unknown Caller")
             st.markdown(f"## 📞 On Call With: {current_contact}")
-
     if st.button("End Call", use_container_width=True):
         clear_call_state()
         st.success("Call session ended.")
