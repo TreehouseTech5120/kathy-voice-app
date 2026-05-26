@@ -177,8 +177,15 @@ def start_signalwire_call(to_number):
         return None
 
     data = response.json()
-    return data.get("sid") or data.get("Sid") or data.get("call_sid") or data.get("id")
+    call_sid = data.get("sid") or data.get("Sid") or data.get("call_sid") or data.get("id")
 
+    if call_sid:
+        st.session_state.active_call_sid = call_sid
+        st.session_state.in_call = True
+        st.session_state.current_contact = to_number
+        st.session_state.mode = "call"
+
+    return call_sid
 
 def play_laml_on_active_call(play_laml_url):
     if not st.session_state.active_call_sid:
