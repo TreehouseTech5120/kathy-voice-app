@@ -350,50 +350,51 @@ if True:
         placeholder="+12085551234"
     )
 
-    if st.button("📞 Start Call", use_container_width=True):
-        if selected_contact:
-            phone_number_to_call = contacts[selected_contact]
-        elif manual_number:
-            phone_number_to_call = manual_number
-        else:
-            st.warning("Select a contact or enter a phone number.")
-            st.stop()
-
-        call_sid = start_signalwire_call(phone_number_to_call)
-
-        if not call_sid:
-            call_sid = get_latest_active_outbound_call(phone_number_to_call)
-
-        if call_sid:
-            st.success(f"GOT CALL SID: {call_sid}")
-
-    requests.post(
-        "https://profound-vibrancy-production-48fe.up.railway.app/set-call-state",
-        data={
-            "call_sid": call_sid,
-            "caller_number": phone_number_to_call
-        }
-    )
-
-    st.session_state.active_call_sid = call_sid
-    st.session_state.current_contact = phone_number_to_call
-    st.session_state.in_call = True
-    st.session_state.mode = "call"
-
-    st.success("Outbound call connected.")
-    st.rerun()
+if st.button("📞 Start Call", use_container_width=True):
+    if selected_contact:
+        phone_number_to_call = contacts[selected_contact]
+    elif manual_number:
+        phone_number_to_call = manual_number
     else:
-            st.error("Call started, but I could not find the active outbound call SID.")
+        st.warning("Select a contact or enter a phone number.")
+        st.stop()
 
-        else:
-            current_contact = st.session_state.get("current_contact", "Unknown Caller")
-            st.markdown(f"## 📞 On Call With: {current_contact}")
+    call_sid = start_signalwire_call(phone_number_to_call)
+
+    if not call_sid:
+        call_sid = get_latest_active_outbound_call(phone_number_to_call)
+
+    if call_sid:
+        st.success(f"GOT CALL SID: {call_sid}")
+
+        requests.post(
+            "https://profound-vibrancy-production-48fe.up.railway.app/set-call-state",
+            data={
+                "call_sid": call_sid,
+                "caller_number": phone_number_to_call
+            }
+        )
+
+        st.session_state.active_call_sid = call_sid
+        st.session_state.current_contact = phone_number_to_call
+        st.session_state.in_call = True
+        st.session_state.mode = "call"
+
+        st.success("Outbound call connected.")
+        st.rerun()
+    else:
+        st.error("Call started, but I could not find the active outbound call SID.")
+
+else:
+    current_contact = st.session_state.get("current_contact", "Unknown Caller")
+    st.markdown(f"## 📞 On Call With: {current_contact}")
+
     if st.button("End Call", use_container_width=True):
         clear_call_state()
         st.success("Call session ended.")
         st.rerun()
-    
-st.markdown("---")
+
+st.markdown("---")    
 
 # ----------------------------
 # SHARED COMMUNICATION SCREEN
