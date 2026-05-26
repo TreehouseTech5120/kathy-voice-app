@@ -114,6 +114,23 @@ def call_status():
     return "OK", 200
 
 
+@app.route("/set-call-state", methods=["POST"])
+def set_call_state():
+    print(">>> SET CALL STATE HIT")
+
+    call_sid = request.values.get("call_sid")
+    caller_number = request.values.get("caller_number")
+
+    with open(CALL_STATE_FILE, "w") as f:
+        json.dump({
+            "in_call": True,
+            "active_call_sid": call_sid,
+            "caller_number": caller_number
+        }, f)
+
+    return "OK", 200
+
+
 @app.route("/call-state", methods=["GET"])
 def get_call_state():
     try:
