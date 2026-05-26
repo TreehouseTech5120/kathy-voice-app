@@ -365,6 +365,8 @@ if True:
             call_sid = get_latest_active_outbound_call(phone_number_to_call)
 
         if call_sid:
+            st.success(f"GOT CALL SID: {call_sid}")
+            
             save_call_state(call_sid, phone_number_to_call, "outbound")
 
             st.session_state.active_call_sid = call_sid
