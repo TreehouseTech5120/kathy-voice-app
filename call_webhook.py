@@ -1,14 +1,15 @@
 from flask import Flask, request, send_file
 import json
 import os
-app = Flask(__name__)
-
 from pathlib import Path
+
+app = Flask(__name__)
 
 APP_DIR = Path(__file__).parent
 CALL_STATE_FILE = APP_DIR / "call_state.json"
 TYPED_AUDIO_FILE = APP_DIR / "typed_message.mp3"
-NGROK_BASE_URL = "https://kathy-voice-app-production.up.railway.app"
+
+WEBHOOK_BASE_URL = "https://profound-vibrancy-production-48fe.up.railway.app"
 
 INTRO_AUDIO_URL = "https://github.com/TreehouseTech5120/kathy-voice-app/raw/refs/heads/main/Hi%20this%20is%20Kathy.mp3"
 
@@ -49,13 +50,28 @@ def incoming_call():
 </Response>""", 200, {"Content-Type": "text/xml"}
 
 
+@app.route("/upload-typed-audio", methods=["POST"])
+def upload_typed_audio():
+    print(">>> UPLOAD TYPED AUDIO HIT")
+
+    audio_bytes = request.get_data()
+
+    if not audio_bytes:
+        return "No audio received", 400
+
+    with open(TYPED_AUDIO_FILE, "wb") as f:
+        f.write(audio_bytes)
+
+    return "OK", 200
+
+
 @app.route("/typed-message-cxml", methods=["GET", "POST"])
 def typed_message_cxml():
     print(">>> TYPED MESSAGE CXML HIT")
 
     return f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Play>{NGROK_BASE_URL}/typed-message-audio</Play>
+    <Play>{WEBHOOK_BASE_URL}/typed-message-audio</Play>
     <Pause length="600"/>
 </Response>""", 200, {"Content-Type": "text/xml"}
 
@@ -63,6 +79,9 @@ def typed_message_cxml():
 @app.route("/typed-message-audio", methods=["GET"])
 def typed_message_audio():
     print(">>> TYPED MESSAGE AUDIO HIT")
+
+    if not TYPED_AUDIO_FILE.exists():
+        return "Typed audio file not found", 404
 
     return send_file(
         TYPED_AUDIO_FILE,
@@ -108,6 +127,7 @@ def get_call_state():
         }
 
     return data, 200
+
 
 if __name__ == "__main__":
     app.run(
