@@ -213,16 +213,18 @@ def play_typed_text_on_active_call(text):
 
     with open(TYPED_AUDIO_FILE, "wb") as f:
         f.write(audio_bytes)
-upload_response = requests.post(
-    "https://profound-vibrancy-production-48fe.up.railway.app/upload-typed-audio",
-    data=audio_bytes,
-    headers={"Content-Type": "audio/mpeg"}
-)
-if upload_response.status_code != 200:
-    st.error(f"Could not upload typed audio: {upload_response.status_code} {upload_response.text}")
-    return
-    
-time.sleep(1)
+
+    upload_response = requests.post(
+        "https://profound-vibrancy-production-48fe.up.railway.app/upload-typed-audio",
+        data=audio_bytes,
+        headers={"Content-Type": "audio/mpeg"}
+    )
+
+    if upload_response.status_code != 200:
+        st.error(f"Could not upload typed audio: {upload_response.status_code} {upload_response.text}")
+        return
+
+    time.sleep(1)
 
     WEBHOOK_BASE_URL = "https://profound-vibrancy-production-48fe.up.railway.app"
 
@@ -241,6 +243,7 @@ time.sleep(1)
         data=payload,
         auth=HTTPBasicAuth(SIGNALWIRE_PROJECT_ID, SIGNALWIRE_API_TOKEN)
     )
+
     if response.status_code not in [200, 201]:
         st.error(f"SignalWire update error: {response.status_code} {response.text}")
     else:
