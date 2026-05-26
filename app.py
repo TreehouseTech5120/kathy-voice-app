@@ -382,11 +382,12 @@ if True:
 
     st.success("Outbound call connected.")
     st.rerun()
-else:
-    st.error("Call started, but I could not find the active outbound call SID.")
+            else:
+                st.error("Call started, but I could not find the active outbound call SID.")
+
         else:
-    current_contact = st.session_state.get("current_contact", "Unknown Caller")
-    st.markdown(f"## 📞 On Call With: {current_contact}")
+            current_contact = st.session_state.get("current_contact", "Unknown Caller")
+            st.markdown(f"## 📞 On Call With: {current_contact}")
 
     if st.button("End Call", use_container_width=True):
         clear_call_state()
