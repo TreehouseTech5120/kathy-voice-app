@@ -412,6 +412,7 @@ st.markdown("---")
 # SHARED COMMUNICATION SCREEN
 # Works in person OR during call
 # ----------------------------
+check_for_active_webhook_call()
 
 if st.session_state.in_call:
     st.success("Call Mode Active")
