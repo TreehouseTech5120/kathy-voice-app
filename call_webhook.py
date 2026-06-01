@@ -1,4 +1,4 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, Response
 import json
 import os
 from pathlib import Path
@@ -11,7 +11,12 @@ TYPED_AUDIO_FILE = APP_DIR / "typed_message.mp3"
 
 WEBHOOK_BASE_URL = "https://profound-vibrancy-production-48fe.up.railway.app"
 
-INTRO_AUDIO_URL = "https://github.com/TreehouseTech5120/kathy-voice-app/raw/refs/heads/main/Hi%20this%20is%20Kathy.mp3"
+KATHY_PHONE_NUMBER = "+12082469929"
+
+
+def save_call_state(data):
+    with open(CALL_STATE_FILE, "w") as f:
+        json.dump(data, f)
 
 
 @app.route("/incoming-call", methods=["GET", "POST"])
@@ -36,18 +41,29 @@ def incoming_call():
         or request.values.get("caller")
     )
 
-    with open(CALL_STATE_FILE, "w") as f:
-        json.dump({
-            "in_call": True,
-            "active_call_sid": call_sid,
-            "caller_number": caller_number
-        }, f)
+    save_call_state({
+        "in_call": True,
+        "active_call_sid": call_sid,
+        "caller_number": caller_number,
+        "status": "bridging"
+    })
 
-    return f"""<?xml version="1.0" encoding="UTF-8"?>
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Play>{INTRO_AUDIO_URL}</Play>
-    <Pause length="600"/>
-</Response>""", 200, {"Content-Type": "text/xml"}
+    <Dial
+        action="{WEBHOOK_BASE_URL}/call-status"
+        method="POST"
+        answerOnBridge="true">
+        <Number
+            statusCallback="{WEBHOOK_BASE_URL}/call-status"
+            statusCallbackEvent="initiated ringing answered completed"
+            statusCallbackMethod="POST">
+            {KATHY_PHONE_NUMBER}
+        </Number>
+    </Dial>
+</Response>"""
+
+    return Response(xml, mimetype="text/xml")
 
 
 @app.route("/upload-typed-audio", methods=["POST"])
@@ -63,17 +79,6 @@ def upload_typed_audio():
         f.write(audio_bytes)
 
     return "OK", 200
-
-
-@app.route("/typed-message-cxml", methods=["GET", "POST"])
-def typed_message_cxml():
-    print(">>> TYPED MESSAGE CXML HIT")
-
-    return f"""<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-    <Play>{WEBHOOK_BASE_URL}/typed-message-audio</Play>
-    <Pause length="600"/>
-</Response>""", 200, {"Content-Type": "text/xml"}
 
 
 @app.route("/typed-message-audio", methods=["GET"])
@@ -100,16 +105,16 @@ def call_status():
         request.values.get("CallStatus")
         or request.values.get("call_status")
         or request.values.get("callstatus")
+        or request.values.get("DialCallStatus")
     )
 
     if call_status in ["completed", "failed", "busy", "no-answer", "canceled"]:
-        with open(CALL_STATE_FILE, "w") as f:
-            json.dump({
-                "in_call": False,
-                "active_call_sid": None,
-                "caller_number": None,
-                "status": call_status
-            }, f)
+        save_call_state({
+            "in_call": False,
+            "active_call_sid": None,
+            "caller_number": None,
+            "status": call_status
+        })
 
     return "OK", 200
 
@@ -121,12 +126,12 @@ def set_call_state():
     call_sid = request.values.get("call_sid")
     caller_number = request.values.get("caller_number")
 
-    with open(CALL_STATE_FILE, "w") as f:
-        json.dump({
-            "in_call": True,
-            "active_call_sid": call_sid,
-            "caller_number": caller_number
-        }, f)
+    save_call_state({
+        "in_call": True,
+        "active_call_sid": call_sid,
+        "caller_number": caller_number,
+        "status": "manual"
+    })
 
     return "OK", 200
 
@@ -140,7 +145,8 @@ def get_call_state():
         data = {
             "in_call": False,
             "active_call_sid": None,
-            "caller_number": None
+            "caller_number": None,
+            "status": "none"
         }
 
     return data, 200
