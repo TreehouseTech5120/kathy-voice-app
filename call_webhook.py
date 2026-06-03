@@ -10,7 +10,7 @@ CALL_STATE_FILE = APP_DIR / "call_state.json"
 TYPED_AUDIO_FILE = APP_DIR / "typed_message.mp3"
 
 WEBHOOK_BASE_URL = "https://profound-vibrancy-production-48fe.up.railway.app"
-
+SIGNALWIRE_NUMBER = "+13183468044"
 KATHY_PHONE_NUMBER = "+13184264262"
 
 
@@ -49,7 +49,7 @@ def incoming_call():
 
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Dial>
+    <Dial callerId="{SIGNALWIRE_NUMBER}" timeout="30">
         <Number>{KATHY_PHONE_NUMBER}</Number>
     </Dial>
 </Response>"""
