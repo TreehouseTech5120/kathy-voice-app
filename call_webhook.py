@@ -11,7 +11,7 @@ TYPED_AUDIO_FILE = APP_DIR / "typed_message.mp3"
 
 WEBHOOK_BASE_URL = "https://profound-vibrancy-production-48fe.up.railway.app"
 SIGNALWIRE_NUMBER = "+13183468044"
-KATHY_PHONE_NUMBER = "+13184264262"
+KATHY_PHONE_NUMBER = "+12082469929"
 
 
 def save_call_state(data):
