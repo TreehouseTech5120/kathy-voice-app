@@ -48,13 +48,10 @@ def incoming_call():
         "status": "bridging"
     })
 
-        xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Dial>{+13184262462}</Dial>
+    <Dial>{KATHY_PHONE_NUMBER}</Dial>
 </Response>"""
-
-    return Response(xml, mimetype="text/xml")
-
 
 @app.route("/upload-typed-audio", methods=["POST"])
 def upload_typed_audio():
