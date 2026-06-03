@@ -18,7 +18,6 @@ def save_call_state(data):
     with open(CALL_STATE_FILE, "w") as f:
         json.dump(data, f)
 
-
 @app.route("/incoming-call", methods=["GET", "POST"])
 def incoming_call():
     print(">>> INCOMING CALL HIT")
@@ -50,8 +49,12 @@ def incoming_call():
 
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Dial>{KATHY_PHONE_NUMBER}</Dial>
+    <Dial>
+        <Number>{KATHY_PHONE_NUMBER}</Number>
+    </Dial>
 </Response>"""
+
+    return Response(xml, mimetype="text/xml")
 
 @app.route("/upload-typed-audio", methods=["POST"])
 def upload_typed_audio():
