@@ -48,19 +48,9 @@ def incoming_call():
         "status": "bridging"
     })
 
-    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+        xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Dial
-        action="{WEBHOOK_BASE_URL}/call-status"
-        method="POST"
-        answerOnBridge="true">
-        <Number
-            statusCallback="{WEBHOOK_BASE_URL}/call-status"
-            statusCallbackEvent="initiated ringing answered completed"
-            statusCallbackMethod="POST">
-            {KATHY_PHONE_NUMBER}
-        </Number>
-    </Dial>
+    <Dial>{+13184262462}</Dial>
 </Response>"""
 
     return Response(xml, mimetype="text/xml")
