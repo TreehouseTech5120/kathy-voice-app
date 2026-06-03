@@ -49,7 +49,7 @@ def incoming_call():
 
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Dial callerId="{SIGNALWIRE_NUMBER}" timeout="30">
+    <Dial timeout="30">
         <Number>{KATHY_PHONE_NUMBER}</Number>
     </Dial>
 </Response>"""
