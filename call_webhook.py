@@ -1,6 +1,7 @@
 from flask import Flask, request, send_file, Response
 import json
 import os
+import requests
 from pathlib import Path
 
 app = Flask(__name__)
@@ -15,10 +16,63 @@ KATHY_PHONE_NUMBER = "+13184262462"
 
 CONFERENCE_NAME = "kathy_voice_room"
 
+SIGNALWIRE_PROJECT_ID = os.environ.get("SIGNALWIRE_PROJECT_ID")
+SIGNALWIRE_API_TOKEN = os.environ.get("SIGNALWIRE_API_TOKEN")
+SIGNALWIRE_SPACE_URL = os.environ.get("SIGNALWIRE_SPACE_URL")
+
 
 def save_call_state(data):
     with open(CALL_STATE_FILE, "w") as f:
         json.dump(data, f)
+
+
+def load_call_state():
+    try:
+        with open(CALL_STATE_FILE, "r") as f:
+            return json.load(f)
+    except Exception:
+        return {
+            "in_call": False,
+            "active_call_sid": None,
+            "caller_number": None,
+            "status": "none"
+        }
+
+
+def call_kathy_into_conference():
+    print(">>> CALLING KATHY INTO CONFERENCE")
+
+    if not SIGNALWIRE_PROJECT_ID or not SIGNALWIRE_API_TOKEN or not SIGNALWIRE_SPACE_URL:
+        print("!!! Missing SignalWire env vars")
+        return None
+
+    url = f"https://{SIGNALWIRE_SPACE_URL}/api/laml/2010-04-01/Accounts/{SIGNALWIRE_PROJECT_ID}/Calls.json"
+
+    payload = {
+        "To": KATHY_PHONE_NUMBER,
+        "From": SIGNALWIRE_NUMBER,
+        "Url": f"{WEBHOOK_BASE_URL}/kathy-join-conference",
+        "Method": "GET",
+        "StatusCallback": f"{WEBHOOK_BASE_URL}/call-status",
+        "StatusCallbackMethod": "POST"
+    }
+
+    response = requests.post(
+        url,
+        data=payload,
+        auth=(SIGNALWIRE_PROJECT_ID, SIGNALWIRE_API_TOKEN),
+        timeout=15
+    )
+
+    print("SignalWire response:", response.status_code, response.text)
+
+    if response.status_code >= 400:
+        return None
+
+    try:
+        return response.json().get("sid") or response.json().get("Sid")
+    except Exception:
+        return None
 
 
 @app.route("/incoming-call", methods=["GET", "POST"])
@@ -43,9 +97,12 @@ def incoming_call():
         or request.values.get("caller")
     )
 
+    kathy_call_sid = call_kathy_into_conference()
+
     save_call_state({
         "in_call": True,
         "active_call_sid": call_sid,
+        "kathy_call_sid": kathy_call_sid,
         "caller_number": caller_number,
         "status": "conference"
     })
@@ -107,23 +164,7 @@ def typed_message_audio():
     if not TYPED_AUDIO_FILE.exists():
         return "Typed audio file not found", 404
 
-    return send_file(
-        TYPED_AUDIO_FILE,
-        mimetype="audio/mpeg"
-    )
-
-
-@app.route("/typed-message-cxml", methods=["GET", "POST"])
-def typed_message_cxml():
-    print(">>> TYPED MESSAGE CXML HIT")
-
-    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
-<Response>
-    <Play>{WEBHOOK_BASE_URL}/typed-message-audio</Play>
-    <Redirect method="GET">{WEBHOOK_BASE_URL}/incoming-call</Redirect>
-</Response>"""
-
-    return Response(xml, mimetype="text/xml")
+    return send_file(TYPED_AUDIO_FILE, mimetype="audio/mpeg")
 
 
 @app.route("/call-status", methods=["GET", "POST"])
@@ -141,10 +182,12 @@ def call_status():
     )
 
     if call_status in ["completed", "failed", "busy", "no-answer", "canceled"]:
+        current_state = load_call_state()
         save_call_state({
+            **current_state,
             "in_call": False,
             "active_call_sid": None,
-            "caller_number": None,
+            "kathy_call_sid": None,
             "status": call_status
         })
 
@@ -170,18 +213,7 @@ def set_call_state():
 
 @app.route("/call-state", methods=["GET"])
 def get_call_state():
-    try:
-        with open(CALL_STATE_FILE, "r") as f:
-            data = json.load(f)
-    except Exception:
-        data = {
-            "in_call": False,
-            "active_call_sid": None,
-            "caller_number": None,
-            "status": "none"
-        }
-
-    return data, 200
+    return load_call_state(), 200
 
 
 if __name__ == "__main__":
