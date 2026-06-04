@@ -13,10 +13,13 @@ WEBHOOK_BASE_URL = "https://profound-vibrancy-production-48fe.up.railway.app"
 SIGNALWIRE_NUMBER = "+13183468404"
 KATHY_PHONE_NUMBER = "+13184262462"
 
+CONFERENCE_NAME = "kathy_voice_room"
+
 
 def save_call_state(data):
     with open(CALL_STATE_FILE, "w") as f:
         json.dump(data, f)
+
 
 @app.route("/incoming-call", methods=["GET", "POST"])
 def incoming_call():
@@ -44,17 +47,43 @@ def incoming_call():
         "in_call": True,
         "active_call_sid": call_sid,
         "caller_number": caller_number,
-        "status": "bridging"
+        "status": "conference"
     })
 
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <Response>
-    <Dial timeout="30">
-        <Number>{KATHY_PHONE_NUMBER}</Number>
+    <Dial>
+        <Conference
+            startConferenceOnEnter="true"
+            endConferenceOnExit="true">
+            {CONFERENCE_NAME}
+        </Conference>
     </Dial>
 </Response>"""
 
     return Response(xml, mimetype="text/xml")
+
+
+@app.route("/kathy-join-conference", methods=["GET", "POST"])
+def kathy_join_conference():
+    print(">>> KATHY JOIN CONFERENCE HIT")
+    print("METHOD:", request.method)
+    print("ARGS:", dict(request.args))
+    print("FORM:", dict(request.form))
+
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Dial>
+        <Conference
+            startConferenceOnEnter="true"
+            endConferenceOnExit="true">
+            {CONFERENCE_NAME}
+        </Conference>
+    </Dial>
+</Response>"""
+
+    return Response(xml, mimetype="text/xml")
+
 
 @app.route("/upload-typed-audio", methods=["POST"])
 def upload_typed_audio():
@@ -82,6 +111,19 @@ def typed_message_audio():
         TYPED_AUDIO_FILE,
         mimetype="audio/mpeg"
     )
+
+
+@app.route("/typed-message-cxml", methods=["GET", "POST"])
+def typed_message_cxml():
+    print(">>> TYPED MESSAGE CXML HIT")
+
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Play>{WEBHOOK_BASE_URL}/typed-message-audio</Play>
+    <Redirect method="GET">{WEBHOOK_BASE_URL}/incoming-call</Redirect>
+</Response>"""
+
+    return Response(xml, mimetype="text/xml")
 
 
 @app.route("/call-status", methods=["GET", "POST"])
