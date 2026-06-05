@@ -157,6 +157,19 @@ def upload_typed_audio():
     return "OK", 200
 
 
+@app.route("/typed-message-cxml", methods=["GET", "POST"])
+def typed_message_cxml():
+    print(">>> TYPED MESSAGE CXML HIT")
+
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+    <Play>{WEBHOOK_BASE_URL}/typed-message-audio</Play>
+    <Redirect method="GET">https://profound-vibrancy-production-48fe.up.railway.app/kathy-join-conference</Redirect>
+</Response>"""
+
+    return Response(xml, mimetype="text/xml")
+
+
 @app.route("/typed-message-audio", methods=["GET"])
 def typed_message_audio():
     print(">>> TYPED MESSAGE AUDIO HIT")
@@ -164,8 +177,10 @@ def typed_message_audio():
     if not TYPED_AUDIO_FILE.exists():
         return "Typed audio file not found", 404
 
-    return send_file(TYPED_AUDIO_FILE, mimetype="audio/mpeg")
-
+    return send_file(
+        TYPED_AUDIO_FILE,
+        mimetype="audio/mpeg"
+    )
 
 @app.route("/call-status", methods=["GET", "POST"])
 def call_status():
