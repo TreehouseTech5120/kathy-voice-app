@@ -177,6 +177,7 @@ def start_signalwire_call(to_number):
         return None
 
     data = response.json()
+    requests.get("https://profound-vibrancy-production-48fe.up.railway.app/start-kathy-leg")
     call_sid = data.get("sid") or data.get("Sid") or data.get("call_sid") or data.get("id")
 
     if call_sid:
