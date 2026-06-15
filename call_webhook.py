@@ -229,7 +229,22 @@ def set_call_state():
 @app.route("/call-state", methods=["GET"])
 def get_call_state():
     return load_call_state(), 200
+    
+@app.route("/start-kathy-leg", methods=["GET", "POST"])
+def start_kathy_leg():
+    print(">>> START KATHY LEG HIT")
 
+    kathy_call_sid = call_kathy_into_conference()
+
+    current_state = load_call_state()
+    save_call_state({
+        **current_state,
+        "kathy_call_sid": kathy_call_sid,
+        "in_call": True,
+        "status": "conference"
+    })
+
+    return "OK", 200
 
 if __name__ == "__main__":
     app.run(
