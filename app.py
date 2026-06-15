@@ -163,7 +163,7 @@ def start_signalwire_call(to_number):
     payload = {
         "From": SIGNALWIRE_FROM_NUMBER,
         "To": to_number,
-        "Url": "https://myvoiceaid.signalwire.com/laml-bins/a7422232-1e29-46c1-921b-63a94a1c6b8e"
+        "Url": "https://profound-vibrancy-production-48fe.up.railway.app/kathy-join-conference"
     }
 
     response = requests.post(
